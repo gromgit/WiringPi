@@ -85,12 +85,7 @@ fi
 if [ x$1 = "xdebian" ]; then
   here=`pwd`
   version=`cat $here/VERSION`
-  arch=`uname -m`
-  case "$arch" in
-    arm*) arch=armhf;;
-    aarch64*) arch=arm64;;
-    *) echo "FATAL ERROR: Unknown architecture $arch"; exit 1;;
-  esac
+  arch=`dpkg-architecture -q DEB_BUILD_ARCH`
   cd debian-template/wiringPi
   rm -rf usr
   cd $here/wiringPi
@@ -102,7 +97,7 @@ if [ x$1 = "xdebian" ]; then
   cd $here/debian-template
   sed -e "s/%%VERSION%%/${version}/" -e "s/%%ARCH%%/${arch}/" < wiringPi/DEBIAN/control.template > wiringPi/DEBIAN/control
   fakeroot dpkg-deb --build wiringPi
-  mv wiringPi.deb  wiringpi-"${version}"-1.deb
+  mv wiringPi.deb "${here}/wiringpi_${version}-1_${arch}".deb
   exit
 fi
 
